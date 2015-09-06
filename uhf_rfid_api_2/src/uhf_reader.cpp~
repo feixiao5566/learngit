@@ -1,0 +1,73 @@
+/*********************************************************************************
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2015, Tasbot, Inc.
+ *  All rights reserved.
+ *
+ *FileName:  uhf_inventory_single_tag.cpp
+ *Author:  feixiao5566 feixiao5566@126.com
+ *Version:  0.3
+ *Date:  2015-06-01
+ *Description:  //收到18次数据，停止5s发送STOPSTOPSTOP模拟机器人停止前进
+                //与其他模块或函数的接口、输出值、取值范围、
+                //含义及参数间的控制、顺序、独立及依赖关系
+ *Others:  此文件仅为接收话题的测试文件
+ *Function List:  //主要函数列表，每条记录应包含函数名及功能简要说明
+     1.…………
+     2.…………
+ *History:  //修改历史记录列表，每条修改记录应包含修改日期、修改者及修改内容简介
+     1.Date:2015-5-13
+       Author:feixiao
+       Modification:接收话题消息，
+     2.…………
+**********************************************************************************/
+#include "ros/ros.h"
+#include "std_msgs/String.h"
+#include "uhf_rfid_api/UhfRfid.h"//custom message
+  signed int sum = 0;
+int num = 0;
+int i = 0;
+//收到18次STOP消息就停一下，停5s
+/*
+void rssicompare(string msgepc, string findepc)
+{
+  
+}*/
+void chatterCallback(const uhf_rfid_api::UhfRfid::ConstPtr& msg)
+{
+  
+
+  float avg = 0;
+  
+  ros::Rate rate(1);// sleep 1s
+//  ROS_INFO("I heard: [%s]", msg->data.c_str());
+//  num = msg->RSSI;
+//  ROS_INFO("RSSI: %d", msg->RSSI);
+  sum += msg->RSSI;
+  i++;
+  if(0 == msg->RSSI)
+  {
+    i--;
+  }
+//  ROS_INFO("sum: %d", sum);
+  if(i == 5)
+  {
+    avg = sum/5.0;
+    i = 0;
+    sum = 0;
+    ROS_INFO("avg: %f", avg);
+  }
+}
+
+int main(int argc, char **argv)
+{
+
+  ros::init(argc, argv, "listener");
+
+  ros::NodeHandle n;
+printf("dadaa\n");
+  ros::Subscriber sub = n.subscribe("messageepc", 1, chatterCallback);
+
+  ros::spin();
+  return 0;
+}
